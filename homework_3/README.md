@@ -253,7 +253,7 @@ root@ubuntulearn:/home/kusk111serj/k8s_homeworks/homework_3/src# kubectl create 
 namespace/task2 created
 ```
 
-#### Создаем deployment без service_task2.yaml и наблюдаем что под находится в состоянии init
+#### Создаем deployment без servicetask2.yaml и наблюдаем что под находится в состоянии init
 
 ```
 root@ubuntulearn:/home/kusk111serj/k8s_homeworks/homework_3/src# kubectl apply -f deployment_task2.yaml -n task2
@@ -264,3 +264,7 @@ deployment.apps/deploy2 created
 <img width="927" height="126" alt="1 2" src="https://github.com/user-attachments/assets/a6140895-0bcc-46e8-ad19-2fa01d44cb1f" />
 
 <img width="495" height="219" alt="1 3" src="https://github.com/user-attachments/assets/665dfe3e-0fe4-4ad2-a5d3-0a5fa8e9545d" />
+
+#### Создаем service, наблюдаем что под запустился
+
+<img width="1244" height="135" alt="1 4" src="https://github.com/user-attachments/assets/d447828c-43e2-49fa-9b21-f68aa42e3971" />
