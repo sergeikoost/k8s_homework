@@ -175,3 +175,92 @@ root@ubuntulearn:/home/kusk111serj/k8s_homeworks/homework_3/src# kubectl exec -i
 </body>
 </html>
 ```
+
+### Задание 2. Создать Deployment и обеспечить старт основного контейнера при выполнении условий
+
+1. Создать Deployment приложения nginx и обеспечить старт контейнера только после того, как будет запущен сервис этого приложения.
+2. Убедиться, что nginx не стартует. В качестве Init-контейнера взять busybox.
+3. Создать и запустить Service. Убедиться, что Init запустился.
+4. Продемонстрировать состояние пода до и после запуска сервиса.
+
+#### Для выполнения 2 задачи создаем 2 файла.
+
+1. deployment_task1.yaml
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy2
+  namespace: task2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-init
+  template:
+    metadata:
+      labels:
+        app: nginx-init
+    spec:
+      initContainers:
+      - name: wait-for-service
+        image: busybox:1.36
+        command: 
+          - 'sh'
+          - '-c'
+          - |
+            until nslookup svc2.task2.svc.cluster.local; do 
+              echo "Waiting for service svc2..."; 
+              sleep 3; 
+            done
+            echo "Service servicetask2 is available!"
+      containers:
+      - name: nginx
+        image: nginx:1.24.0
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "250m"
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 80
+```
+
+2. servicetask2.yaml
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: servicetask2
+  namespace: task2
+spec:
+  selector:
+    app: nginx-init
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+  ```
+
+#### После создания необходимо создать новый namespace, чтобы изолировать окружение 2-ух разных задач и чтобы было проще управлять подами.
+
+```
+root@ubuntulearn:/home/kusk111serj/k8s_homeworks/homework_3/src# kubectl create namespace task2
+namespace/task2 created
+```
+
+#### Создаем deployment без service_task2.yaml и наблюдаем что под находится в состоянии init
+
+```
+root@ubuntulearn:/home/kusk111serj/k8s_homeworks/homework_3/src# kubectl apply -f deployment_task2.yaml -n task2
+deployment.apps/deploy2 created
+
+```
+
+<img width="927" height="126" alt="1 2" src="https://github.com/user-attachments/assets/a6140895-0bcc-46e8-ad19-2fa01d44cb1f" />
+
+<img width="495" height="219" alt="1 3" src="https://github.com/user-attachments/assets/665dfe3e-0fe4-4ad2-a5d3-0a5fa8e9545d" />
