@@ -20,7 +20,7 @@ spec:
           - 'sh'
           - '-c'
           - |
-            until nslookup svc2.task2.svc.cluster.local; do 
+            until nslookup servicetask2.task2.svc.cluster.local; do 
               echo "Waiting for service svc2..."; 
               sleep 3; 
             done
