@@ -8,7 +8,7 @@
 
 **Ответ**
 
-#### Для выполнения задания создаем 2 файла.
+#### Для выполнения задания создаем 3 файла.
 
 1) deploy_1.yaml
 
@@ -16,14 +16,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deploy
-  labels:
-    task: one
-    tier: homework
-  annotations:
-    container1: nginx
-    container2: multitool  
+  name: nginx-multitool-deployment
   namespace: task1
+  labels:
+    app: nginx-multitool
 spec:
   replicas: 3
   selector:
@@ -35,80 +31,54 @@ spec:
         app: nginx-multitool
     spec:
       containers:
-        - name: nginx
-          image: nginx:alpine
-          resources:
-            limits:
-              memory: "64Mi"
-              cpu: "200m"
-            requests:
-              memory: "32Mi"
-              cpu: "100m"
-          ports:
-            - containerPort: 80
-          livenessProbe:
-            tcpSocket:
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 20
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 20
-        - name: multitool
-          image: praqma/network-multitool:alpine-extra
-          resources:
-            limits:
-              memory: "64Mi"
-              cpu: "200m"
-            requests:
-              memory: "32Mi"
-              cpu: "100m"
-          env:
-            - name: HTTP_PORT
-              value: "8080"
-            - name: HTTPS_PORT
-              value: "1443"
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
-            - name: https
-              containerPort: 1443
-              protocol: TCP
-          livenessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 15
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+      - name: multitool
+        image: praqma/network-multitool:alpine-extra
+        env:
+        - name: HTTP_PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080
 ```
 
 2) service.yaml
 
 ```
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: service
-  namespace: homework4
+  name: clusterip-service
+  namespace: task1
 spec:
   selector:
     app: nginx-multitool
   type: ClusterIP
   ports:
-    - name: nginx
-      port: 9001
-      targetPort: 80
-    - name: multitool
-      port: 9002
-      targetPort: 8080
-...
+  - name: nginx
+    port: 9001
+    targetPort: 80
+  - name: multitool
+    port: 9002
+    targetPort: 8080
 ```
+3) nodeport-service.yaml
 
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeport-service
+  namespace: task1
+spec:
+  selector:
+    app: nginx-multitool
+  type: NodePort
+  ports:
+  - name: nginx
+    port: 80
+    targetPort: 80
+    nodePort: 30080
+  ```  
