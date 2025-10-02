@@ -109,3 +109,31 @@ spec:
     targetPort: 80
     nodePort: 30080
   ```  
+
+#### Применяем эти манифесты и проверяем что ресурсы создались
+
+```
+kubectl apply -f deployment-multi-container.yaml
+kubectl apply -f service-clusterip.yaml
+kubectl apply -f nodeport-service.yaml
+```
+
+<img width="924" height="434" alt="1 1" src="https://github.com/user-attachments/assets/095d19e4-2f49-4e9a-9a47-f0835fdc0369" />
+
+#### Тестируем Cluser-ip изнутри кластера, для этого запускаем тестовый под и с него делаем curl на порты 9001 и 9002 
+
+```
+kubectl run test-pod --image=wbitt/network-multitool --rm -it --restart=Never -- sh
+
+
+curl clusterip-service.task1.svc.cluster.local:9001 
+curl clusterip-service.task1.svc.cluster.local:9002  
+```
+<img width="1116" height="496" alt="1 2" src="https://github.com/user-attachments/assets/11bb2d3c-2e56-4ea0-b887-660b895226e7" />
+
+#### Тестируем NodePort снаружи, для этого я перешел с веб-браузера на внешний ip адрес своей vm по порту 30080
+
+<img width="1837" height="413" alt="1 3" src="https://github.com/user-attachments/assets/161c374e-0824-43bf-81e1-5cf00a934c34" />
+
+
+
