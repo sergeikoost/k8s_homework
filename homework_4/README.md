@@ -30,9 +30,12 @@ kubectl run test-pod --image=wbitt/network-multitool --rm -it -- sh
 ### 5. Проверить доступ с локального компьютера или через браузер.
 
 
+
+
 **Ответ**
 
-#### Для выполнения задания создаем 3 файла.
+
+### Для выполнения задания создаем 3 файла.
 
 1) deployment-multi-container.yaml
 
