@@ -137,3 +137,31 @@ curl clusterip-service.task1.svc.cluster.local:9002
 
 
 
+# Задание 2: Настройка Ingress
+
+## Задача
+
+Развернуть два приложения (`frontend` и `backend`) и обеспечить доступ к ним через Ingress по разным путям:
+- `frontend` — по пути `/`
+- `backend` — по пути `/api`
+
+#### Шаги выполнения
+
+1. **Создать два Deployment:**
+   - `frontend` на основе образа `nginx`
+   - `backend` на основе образа `wbitt/network-multitool`
+   - Количество реплик: не менее 1 для каждого
+
+2. **Создать Service для каждого приложения:**
+   - `frontend-svc` — для сервиса `frontend`
+   - `backend-svc` — для сервиса `backend`
+   - Тип сервиса: `ClusterIP` (по умолчанию)
+
+3. **Включить Ingress-контроллер:**
+   Выполните команду в зависимости от вашей среды:
+   ```bash
+   microk8s enable ingress
+   ```
+
+   
+   ## **Ответ**
