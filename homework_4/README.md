@@ -172,3 +172,130 @@ curl clusterip-service.task1.svc.cluster.local:9002
 
    
    ## **Ответ**
+
+1) deployment-frontend.yaml
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: task2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+```
+2) deployment-backend.yaml
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: task2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: wbitt/network-multitool
+        env:
+        - name: HTTP_PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080
+```
+
+3) service-frontend.yaml
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: task2
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+```
+4) service-backend.yaml
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: task2
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 8080
+    targetPort: 8080
+ ```   
+5) ingress.yaml
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: task2-ingress
+  namespace: task2
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8080
+```                            
+
+#### Применяем эти манифесты и проверяем что ресурсы создались
+
+<img width="967" height="751" alt="2 1" src="https://github.com/user-attachments/assets/dac399fd-b88b-4380-b641-4ded5047da7d" />
+
+#### С удаленного хоста делаем curl 
+
+ 1) curl <host>/
+
+ <img width="1895" height="571" alt="2 2" src="https://github.com/user-attachments/assets/73378786-4a15-40e7-b3dd-e9492cac7cb2" />
+
+ 2) curl <host>/api
+
+<img width="1428" height="414" alt="2 3" src="https://github.com/user-attachments/assets/06d28868-eeaf-4bbf-a119-64fae3ecaf7c" />
+
