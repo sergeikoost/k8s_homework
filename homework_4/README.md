@@ -8,7 +8,7 @@
 
 **Ответ**
 
-#### Для выполнения задания создаем 3 файла
+#### Для выполнения задания создаем 2 файла.
 
 1) deploy_1.yaml
 
@@ -112,46 +112,3 @@ spec:
 ...
 ```
 
-3) pod.yaml
-
-```
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pod-multitool
-  labels:
-    app: multitool
-  namespace: homework4
-spec:
-  containers:
-    - name: multitool
-      image: praqma/network-multitool:alpine-extra
-      resources:
-        limits:
-          memory: "64Mi"
-          cpu: "200m"
-        requests:
-          memory: "32Mi"
-          cpu: "100m"
-      env:
-        - name: HTTP_PORT
-          value: "8090"
-      ports:
-        - name: http
-          containerPort: 8090
-          protocol: TCP
-      livenessProbe:
-        tcpSocket:
-          port: 8090
-        initialDelaySeconds: 10
-        timeoutSeconds: 3
-      readinessProbe:
-        httpGet:
-          path: /
-          port: 8090
-        initialDelaySeconds: 15
-        timeoutSeconds: 5
-        successThreshold: 1
-        failureThreshold: 2
-```
