@@ -43,15 +43,13 @@ spec:
       containers:
       - name: writer
         image: busybox
-        command: ["/bin/sh", "-c"] 
-        args: ["while true; do echo 'Data from busybox at $(date)' >> /shared/data.txt; sleep 5; done"] 
+        command: ["/bin/sh", "-c", "while true; do echo 'Data from busybox at '$(date) >> /shared/data.txt; sleep 5; done"]
         volumeMounts:
         - name: shared-volume
           mountPath: /shared
       - name: reader
         image: wbitt/network-multitool
-        command: ["/bin/sh", "-c"]
-        args: ["tail -f /shared/data.txt"]
+        command: ["/bin/sh", "-c", "tail -f /shared/data.txt"]
         volumeMounts:
         - name: shared-volume
           mountPath: /shared
