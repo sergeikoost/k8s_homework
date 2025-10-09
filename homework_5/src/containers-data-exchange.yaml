@@ -3,30 +3,30 @@ kind: Deployment
 metadata:
   name: data-exchange
 spec:
-  replicas: # ЗАДАНИЕ: Укажите количество реплик
+  replicas: 1
   selector:
     matchLabels:
-      app: # ДОПОЛНИТЕ: Метка для селектора
+      app: data-exchange-app
   template:
     metadata:
       labels:
-        app: # ПОВТОРИТЕ: Метка из selector.matchLabels
+        app: data-exchange-app
     spec:
       containers:
-      - name: # ДОПОЛНИТЕ: Имя первого контейнера
+      - name: writer
         image: busybox
         command: ["/bin/sh", "-c"] 
-        args: ["echo $(date) > путь_к_файлу; sleep 3600"] # КЛЮЧЕВОЕ: Команда записи данных в файл в директории из секции volumeMounts контейнера
+        args: ["while true; do echo $(date) >> /shared/data/log.txt; sleep 5; done"]
         volumeMounts:
-        - name: # ДОПОЛНИТЕ: Имя монтируемого раздела. Должно совпадать с именем эфемерного хранилища, объявленного на уровне пода.
-          mountPath: # КЛЮЧЕВОЕ: Путь монтирования эфемерного хранилища внутри контейнера 1
-      - name: # ДОПОЛНИТЕ: Имя второго контейнера
-        image: busybox
+        - name: shared-data
+          mountPath: /shared/data
+      - name: reader
+        image: wbitt/network-multitool
         command: ["/bin/sh", "-c"]
-        args: ["tail -f путь_к_файлу"] # КЛЮЧЕВОЕ: Команда для чтения данных из файла, расположенного в директории, указанной в volumeMounts контейнера
+        args: ["tail -f /shared/data/log.txt"]
         volumeMounts:
-        - name: # ДОПОЛНИТЕ: Имя монтируемого раздела. Должно совпадать с именем эфемерного хранилища, объявленного на уровне пода
-          mountPath: # КЛЮЧЕВОЕ: Путь монтирования эфемерного хранилища внутри контейнера 2
+        - name: shared-data
+          mountPath: /shared/data
       volumes:
-      - name: # ДОПОЛНИТЕ: Имя монтируемого раздела эфемерного хранилища
-        emptyDir: {} # ИНФОРМАЦИЯ: Определяем эфемерное хранилище, которое работает только внутри пода
+      - name: shared-data
+        emptyDir: {}
