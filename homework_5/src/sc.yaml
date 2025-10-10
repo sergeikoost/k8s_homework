@@ -1,53 +1,53 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: # ДОПОЛНИТЕ: Имя StorageClass
-provisioner: kubernetes.io/no-provisioner # ИНФОРМАЦИЯ: Нет автоматического развёртывания
+  name: local-storage-sc
+provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: # ДОПОЛНИТЕ: Имя PVC
+  name: data-pvc
 spec:
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: # ДОПОЛНИТЕ: Какой объем хранилища вы хотите передать в контейнер. Должно быть меньше или равно параметру storage из PV
-  storageClassName: # ДОПОЛНИТЕ: Имя StorageClass. Должно совпадать с объявленным ранее
+      storage: 1Gi
+  storageClassName: local-storage-sc
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: data-exchange-sc
 spec:
-  replicas: # ЗАДАНИЕ: Укажите количество реплик
+  replicas: 1
   selector:
     matchLabels:
-      app: # ДОПОЛНИТЕ: Метка для селектора
+      app: data-exchange
   template:
     metadata:
       labels:
-        app: # ПОВТОРИТЕ: Метка из selector.matchLabels
+        app: data-exchange
     spec:
       containers:
-      - name: # ДОПОЛНИТЕ: Имя первого контейнера
+      - name: writer
         image: busybox
         command: ["/bin/sh", "-c"] 
-        args: ["echo $(date) > путь_к_файлу; sleep 3600"] # КЛЮЧЕВОЕ: Команда для чтения данных из файла, расположенного в директории, указанной в volumeMounts контейнера
+        args: ["while true; do echo $(date) >> /shared-data/data_task3.txt; sleep 5; done"]
         volumeMounts:
-        - name: # ДОПОЛНИТЕ: Имя монтируемого раздела. Должно совпадать с именем хранилища, объявленного на уровне пода
-          mountPath: # КЛЮЧЕВОЕ: Путь монтирования хранилища внутри контейнера 1
-      - name: # ДОПОЛНИТЕ: Имя второго контейнера
-        image: busybox
+        - name: shared-storage
+          mountPath: /shared-data
+      - name: reader
+        image: wbitt/network-multitool
         command: ["/bin/sh", "-c"]
-        args: ["tail -f путь_к_файлу"] # КЛЮЧЕВОЕ: Команда для чтения данных из файла, расположенного в директории, указанной в volumeMounts контейнера
+        args: ["tail -f /shared-data/data_task3.txt"]
         volumeMounts:
-        - name: # ДОПОЛНИТЕ: Имя монтируемого раздела. Должно совпадать с именем хранилища, объявленного на уровне пода
-          mountPath: # КЛЮЧЕВОЕ: Путь монтирования хранилища внутри контейнера 2
+        - name: shared-storage
+          mountPath: /shared-data
       volumes:
-      - name: # ДОПОЛНИТЕ: Имя монтируемого раздела хранилища
+      - name: shared-storage
         persistentVolumeClaim:
-          claimName: # КЛЮЧЕВОЕ: Совпадает с именем PVC объявленного ранее
+          claimName: data-pvc
