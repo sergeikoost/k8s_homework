@@ -308,3 +308,123 @@ Data from busybox at Thu Oct 9 09:04:25 UTC 2025
 <img width="616" height="141" alt="task_2 5" src="https://github.com/user-attachments/assets/d5829262-636d-4d27-b1c8-e4b943dc3462" />
 
 PV с persistentVolumeReclaimPolicy: Retain, это значит, что при удалении PV данные не удаляются автоматически. Удаление PV в k8s не затрагивает физические файлы на диске. 
+
+
+## Задание 3. StorageClass
+### Задача
+Создать Deployment приложения, использующего PVC, созданный на основе StorageClass.
+
+### Шаги выполнения
+
+1. Создать Deployment приложения, состоящего из контейнеров busybox и multitool, использующего созданный ранее PVC.
+2. Создать SC и PVC для подключения папки на локальной ноде, которая будет использована в поде.
+3. Продемонстрировать, что контейнер multitool может читать данные из файла в смонтированной директории, в который busybox записывает данные каждые 5 секунд.
+
+### Что сдать на проверку
+- Манифесты:
+  - `sc.yaml`
+- Скриншоты:
+  - каждый шаг выполнения задания, начиная с шага 2
+---
+
+#### Для выполнения задания я создал:
+
+1) sc.yaml
+
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pvc
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-storage
+  ```
+
+  2) deploy.yaml для дальнейшей демонстрации работы приложения
+
+  ```
+  apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-exchange-sc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-exchange
+  template:
+    metadata:
+      labels:
+        app: data-exchange
+    spec:
+      containers:
+      - name: busybox-writer
+        image: busybox
+        command: ["/bin/sh", "-c"] 
+        args: ["while true; do echo $(date) >> /mnt/data/data_task3; sleep 5; done"]
+        volumeMounts:
+        - name: shared-data
+          mountPath: /mnt/data
+      - name: multitool-reader
+        image: wbitt/network-multitool
+        command: ["/bin/sh", "-c"]
+        args: ["tail -f /mnt/data/data_task3"]
+        volumeMounts:
+        - name: shared-data
+          mountPath: /mnt/data
+      volumes:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: local-pvc
+   ```       
+3) sc.yaml
+
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-pvc
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-storage
+  ```
+
+  #### После чего поэтапно произвел запуск приложения
+
+1) Запускаем deploy.yaml
+
+  <img width="794" height="206" alt="task_3 3" src="https://github.com/user-attachments/assets/327506a5-c9dd-4ff5-aa23-c6aad27f0eed" />
+
+2) Создаем pv и pvc
+
+<img width="1038" height="281" alt="task_3 1" src="https://github.com/user-attachments/assets/6032ffb8-aaa8-4822-a0cf-f9bb36f5bd7d" />
+
+3) Проверяем что контейнер может читать данные
+
+<img width="991" height="125" alt="task_3 4" src="https://github.com/user-attachments/assets/10c22aa8-4182-4097-9a3a-e252cd50d8f0" />
+
