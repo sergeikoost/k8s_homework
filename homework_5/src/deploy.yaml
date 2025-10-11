@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-exchange-sc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-exchange
+  template:
+    metadata:
+      labels:
+        app: data-exchange
+    spec:
+      containers:
+      - name: busybox-writer
+        image: busybox
+        command: ["/bin/sh", "-c"] 
+        args: ["while true; do echo $(date) >> /mnt/data/data_task3; sleep 5; done"]
+        volumeMounts:
+        - name: shared-data
+          mountPath: /mnt/data
+      - name: multitool-reader
+        image: wbitt/network-multitool
+        command: ["/bin/sh", "-c"]
+        args: ["tail -f /mnt/data/data_task3"]
+        volumeMounts:
+        - name: shared-data
+          mountPath: /mnt/data
+      volumes:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: local-pvc

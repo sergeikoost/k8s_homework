@@ -1,3 +1,4 @@
+# pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -9,9 +10,9 @@ spec:
   accessModes:
   - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage-sc
+  storageClassName: local-storage
   local:
-    path: /mnt/local-data
+    path: /mnt/local-data/
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -19,4 +20,4 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - your-node-name
+          - ubuntulearn
