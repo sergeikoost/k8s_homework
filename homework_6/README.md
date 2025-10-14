@@ -28,15 +28,17 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx-config
+  namespace: default
 data:
   default.conf: |
     server {
         listen 80;
         server_name localhost;
+        root /usr/share/nginx/html;
+        index index.html;
         
         location / {
-            root /usr/share/nginx/html;
-            index index.html;
+            try_files $uri $uri/ =404;
         }
     }
   
@@ -44,22 +46,47 @@ data:
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Web Application</title>
+        <title>Страница из ConfigMap</title>
         <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            .container { max-width: 800px; margin: 0 auto; }
-            .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
+            body { 
+                font-family: Arial, sans-serif; 
+                margin: 40px; 
+                background: #f5f5f5;
+            }
+            .container { 
+                max-width: 800px; 
+                margin: 0 auto; 
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            .header { 
+                background: #4CAF50; 
+                color: white;
+                padding: 20px; 
+                border-radius: 5px; 
+                text-align: center;
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <h1>Welcome to Web Application</h1>
-                <p>This page is served by Nginx with ConfigMap configuration</p>
+                <h1>Привет от Kubernetes!</h1>
+                <p>Эта страница загружена из ConfigMap</p>
             </div>
-            <h2>Application Status</h2>
-            <p>Nginx + Multitool deployment is running successfully!</p>
-            <p>Current time: <span id="datetime"></span></p>
+            <h2>Статус приложения</h2>
+            <p>Nginx + Multitool запущен и работает Pod</p>
+            <p>Конфигурация управляется ConfigMap</p>
+            <p>Текущее время: <span id="datetime"></span></p>
+            <hr>
+            <h3>Компоненты приложения:</h3>
+            <ul>
+                <li>Nginx - веб-сервер</li>
+                <li>Multitool - утилиты для диагностики</li>
+                <li>ConfigMap - управление конфигурацией</li>
+            </ul>
         </div>
         <script>
             document.getElementById('datetime').textContent = new Date().toLocaleString();
@@ -72,7 +99,6 @@ data:
 2) deployment.yaml
 
 ```
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -93,39 +119,20 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: nginx-config
+        - name: nginx-config 
           mountPath: /etc/nginx/conf.d
-        - name: web-content
+          readOnly: true
+        - name: web-content 
           mountPath: /usr/share/nginx/html
+          readOnly: true
       
-      - name: multitool
-        image: wbitt/network-multitool:latest
-        ports:
-        - containerPort: 8080
-        env:
-        - name: HTTP_PORT
-          value: "8080"
-        command: ["/bin/sh"]
-        args: ["-c", "while true; do echo 'Multitool is running'; sleep 30; done"]
-      
-      volumes:
-      - name: nginx-config
-        configMap:
-          name: nginx-config
-      
-      - name: web-content
-        configMap:
-          name: nginx-config
-          items:
-          - key: index.html
-            path: index.html
 
   ```
 
   3) service.yaml для доступа к приложению
 
   ```
-  apiVersion: v1
+apiVersion: v1
 kind: Service
 metadata:
   name: web-service
@@ -136,7 +143,8 @@ spec:
     - name: http
       port: 80
       targetPort: 80
-  type: LoadBalancer
+  type: NodePort
+
 ```
 
 #### Запускаем приложение и сразу проверяем что все необходимые ресурсы были созданы:
