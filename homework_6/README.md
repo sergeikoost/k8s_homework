@@ -155,3 +155,25 @@ kubectl port-forward service/web-service 8080:80 --address 0.0.0.0
 ```
 
 <img width="1911" height="510" alt="task_4 3" src="https://github.com/user-attachments/assets/c7a6f3fe-6727-4869-a080-6f152b0acbdd" />
+
+
+## **Задание 2: Настройка HTTPS с Secrets**  
+### **Задача**  
+Развернуть приложение с доступом по HTTPS, используя самоподписанный сертификат.
+
+### **Шаги выполнения**  
+1. **Сгенерировать SSL-сертификат**
+```bash
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout tls.key -out tls.crt -subj "/CN=myapp.example.com"
+```
+2. **Создать Secret**
+3. **Настроить Ingress**
+4. **Проверить HTTPS-доступ**
+
+### **Что сдать на проверку**  
+- Манифесты:
+  - `secret-tls.yaml`
+  - `ingress-tls.yaml`
+- Скриншот вывода `curl -k`
+
