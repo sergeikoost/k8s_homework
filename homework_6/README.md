@@ -46,47 +46,22 @@ data:
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Страница из ConfigMap</title>
+        <title>Web Application</title>
         <style>
-            body { 
-                font-family: Arial, sans-serif; 
-                margin: 40px; 
-                background: #f5f5f5;
-            }
-            .container { 
-                max-width: 800px; 
-                margin: 0 auto; 
-                background: white;
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-            .header { 
-                background: #4CAF50; 
-                color: white;
-                padding: 20px; 
-                border-radius: 5px; 
-                text-align: center;
-            }
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .container { max-width: 800px; margin: 0 auto; }
+            .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <h1>Привет от Kubernetes!</h1>
-                <p>Эта страница загружена из ConfigMap</p>
+                <h1>Welcome to Web Application</h1>
+                <p>This page is served by Nginx with ConfigMap configuration</p>
             </div>
-            <h2>Статус приложения</h2>
-            <p>Nginx + Multitool запущен и работает Pod</p>
-            <p>Конфигурация управляется ConfigMap</p>
-            <p>Текущее время: <span id="datetime"></span></p>
-            <hr>
-            <h3>Компоненты приложения:</h3>
-            <ul>
-                <li>Nginx - веб-сервер</li>
-                <li>Multitool - утилиты для диагностики</li>
-                <li>ConfigMap - управление конфигурацией</li>
-            </ul>
+            <h2>Application Status</h2>
+            <p>Nginx + Multitool deployment is running successfully!</p>
+            <p>Current time: <span id="datetime"></span></p>
         </div>
         <script>
             document.getElementById('datetime').textContent = new Date().toLocaleString();
@@ -149,12 +124,8 @@ spec:
 
 #### Запускаем приложение и сразу проверяем что все необходимые ресурсы были созданы:
 
-<img width="1077" height="343" alt="task_4 1" src="https://github.com/user-attachments/assets/41896990-804c-482c-b9c1-4b344b2df502" />
+<img width="1430" height="509" alt="task_4 1" src="https://github.com/user-attachments/assets/da498d5b-3d2f-4195-b706-55a679888fd2" />
 
-
-#### Более детальная проверка:
-
-<img width="1250" height="660" alt="task_4 2" src="https://github.com/user-attachments/assets/393c0330-9e16-43f5-b168-3f472b0c3f99" />
 
 #### Делаем port-forward для проверки с удаленного хоста и проверяем работу приложения:
 
