@@ -156,3 +156,106 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   - `ingress-tls.yaml`
 - Скриншот вывода `curl -k`
 
+
+**Ответ**
+
+## Начнем с того, что создадим 3 манифеста, deployment.yaml(развертка тестового приложения), secret-tls.yaml(манифест с сертификатом), ingress-tls.yaml(астраивает терминацию TLS на ingress контроллере) и сгенерируем сертификат.
+
+
+1) Генерируем сертификат
+
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout tls.key -out tls.crt -subj "/CN=myapp.example.com"
+
+cat tls.crt | base64 -w 0
+cat tls.key | base64 -w 0
+
+```
+
+2) secret-tls.yaml:
+
+```
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tls-secret
+  namespace: default
+type: kubernetes.io/tls
+data:
+  tls.crt: LS0tLS1Cyyy
+  tls.key: LS0tLS1Cxxx
+
+```
+
+3) ingress-tls.yaml
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp-tls-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - myapp.example.com
+    secretName: tls-secret
+  rules:
+  - host: myapp.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp-service
+            port:
+              number: 80
+```
+
+3) deployment.yaml
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+```
+
+## Применяем манифесты, проверяем что ресурсы были созданы:
+
+<img width="1013" height="413" alt="task_5 1" src="https://github.com/user-attachments/assets/be72733e-cf32-42b1-a580-5563d295ea0b" />
+
+## Делаем curl запрос с флагом -k
+
+<img width="1253" height="484" alt="task_5 2" src="https://github.com/user-attachments/assets/189df0ba-6947-45f8-a057-f704756940f5" />
