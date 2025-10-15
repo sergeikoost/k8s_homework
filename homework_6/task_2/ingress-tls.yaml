@@ -1,8 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: web-app-ingress
-  namespace: default
+  name: myapp-tls-ingress
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
@@ -18,6 +17,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: web-service
+            name: myapp-service
             port:
               number: 80
