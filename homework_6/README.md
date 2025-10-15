@@ -71,7 +71,7 @@ data:
     
 ```
 
-2) deployment.yaml
+2) deployment.yaml 
 
 ```
 apiVersion: apps/v1
@@ -173,7 +173,7 @@ cat tls.key | base64 -w 0
 
 ```
 
-2) secret-tls.yaml:
+2) secret-tls.yaml (значения data сокращены):
 
 ```
 
