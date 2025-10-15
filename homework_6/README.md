@@ -293,3 +293,60 @@ openssl x509 -req -in developer.csr -CA {CA серт вашего кластер
 
 <img width="1056" height="242" alt="task_6 1" src="https://github.com/user-attachments/assets/a3ce10a5-25ff-450a-93ff-1c46e2c7c282" />
 
+## Создаем 2 манифеста для роли и применяем их:
+
+1) role-pod-reader.yaml
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources:
+    - pods
+    - pods/log
+  verbs:
+    - get
+    - list
+    - watch
+```
+
+2) rolebinding-developer.yaml
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-binding
+  namespace: default
+subjects:
+- kind: User
+  name: developer
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-viewer
+  apiGroup: rbac.authorization.k8s.io
+  ```
+3) Применяем манифесты
+
+```
+root@ubuntulearn:/home/kusk111serj/k8s_homeworks/homework_6/task_3# kubectl apply -f role-pod-reader.yaml
+role.rbac.authorization.k8s.io/pod-viewer created
+root@ubuntulearn:/home/kusk111serj/k8s_homeworks/homework_6/task_3# kubectl apply -f rolebinding-developer.yaml
+rolebinding.rbac.authorization.k8s.io/developer-binding created
+```
+
+## Провеяем доступ, должен быть к просмотру подов/логов/describe и не должно быть к остальному, например к service:
+
+1) Проверка get pod и describe:
+
+<img width="974" height="578" alt="image" src="https://github.com/user-attachments/assets/63dfab3e-c0af-41b8-9318-30b78645e1a6" />
+
+2) Проверка logs и остального, что работать не должно:
+
+<img width="1260" height="392" alt="image" src="https://github.com/user-attachments/assets/b56e06cd-0e03-4a72-bbd4-a10916a10db5" />
+
