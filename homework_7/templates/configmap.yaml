@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cm
+  labels:
+    app: {{ .Values.containers.name }}-page
+data:
+  index.html: |
+      <!DOCTYPE html>
+      <html>
+          <head>
+              <title>Welcom to NGINX!</title>
+          </head>
+          <body>
+              <p>THIS PAGE WORK !!!!</p>
+              <p>ConfigMap page</p>
+          </body>
+      </html>
+...

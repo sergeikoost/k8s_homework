@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-svc
+  labels:
+    revision: "{{ .Release.Revision }}"
+    deployby: {{ .Release.Service }}
+    tier: {{ .Values.labels.tier }}
+spec:
+  selector:
+    app: {{ .Release.Name }}-{{ .Values.containers.name }}
+  type: {{ .Values.svc.type }}
+  ports:
+  - name: {{ .Values.containers.name }}
+    port: {{ .Values.svc.port }}
+    protocol: TCP
+    targetPort: {{ .Values.containers.port }} 

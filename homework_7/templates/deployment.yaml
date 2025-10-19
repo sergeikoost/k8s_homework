@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-dpl
+  labels:
+    revision: "{{ .Release.Revision }}"
+    deployby: {{ .Release.Service }}
+    tier: {{ .Values.labels.tier }}
+    image: {{ .Values.containers.image }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Values.containers.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Values.containers.name }}
+    spec:
+      containers:
+        - name: {{ .Values.containers.name }}
+          image: {{ .Values.containers.image }}:{{ .Values.containers.tag | default .Chart.AppVersion }}
+          resources:
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+          ports:
+            - name: {{ .Values.containers.name }}-listen
+              containerPort: {{ .Values.containers.port }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.containers.port }}
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.containers.port }}
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 4
+          volumeMounts:
+            - name: nginx-page
+              mountPath: "/usr/share/nginx/html"
+      volumes:
+        - name:  nginx-page
+          configMap:
+            name: {{ .Release.Name }}-cm
+...
