@@ -9,6 +9,7 @@
 
 #### Структура проекта для сбора в Helm, все манифесты приложу отдельно в ответе на задание. 
 
+```
 homework_7/
 ├── Chart.yaml
 ├── values.yaml
@@ -18,7 +19,7 @@ homework_7/
 │   ├── ingress.yaml
 │   ├── configmap.yaml
 │   └── secret.yaml
-
+```
 #### Собираю  helm package /home/kusk111serj/k8s_homeworks/homework_7, получаю файл nginx-0.0.1.tgz
 
 ### Задание 2. Запустить две версии в разных неймспейсах
