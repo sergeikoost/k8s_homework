@@ -1,0 +1,5 @@
+yc_token = "y0__xCV_4EbGMHdEyDXhfOZEhkMMzAJxJrlAUrmvxaaAluJOmsT"
+yc_cloud_id = "b1gegid9o4fgtknfbpcj"
+yc_folder_id = "b1gjbscn2p28l9st4t7e"
+yc_zone = "ru-central1-a"
+ssh_public_key_path = "~/.ssh/id_ed25519.pub"
