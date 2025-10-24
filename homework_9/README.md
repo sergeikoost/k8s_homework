@@ -11,3 +11,14 @@
 Задания под звёздочкой необязательные к выполнению и не повлияют на получение зачёта по этому домашнему заданию. 
 
 ### **Ответ**
+
+
+#### Cоздавал ноды при помощи Terraform на платформе Яндекс.Облака. Файл конфигурации Terraform и остальное лежит в директории src/terraform:
+
+<img width="1174" height="234" alt="task_8 2" src="https://github.com/user-attachments/assets/ba62f613-48cf-4d54-920d-1e1a51f34487" />
+
+
+#### Установку делал вручную, через kubeadm, по инструкции:
+
+<img width="587" height="571" alt="task_8 1" src="https://github.com/user-attachments/assets/17cb4d4b-845a-47ed-b70b-eb6667178976" />
+
